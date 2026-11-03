@@ -1,0 +1,18 @@
+#cloud-config
+users:
+  - name: k8s
+    sudo: 'ALL=(ALL) NOPASSWD:ALL'
+    groups: users, admin, sudo
+    shell: /bin/bash
+    ssh_authorized_keys:
+        - ssh-ed25519 ${SSH_PUBLIC_KEY} ${SSH_KEY_COMMENT:-admin@localhost}
+
+packages:
+  - avahi-daemon
+  - qemu-guest-agent
+
+runcmd:
+  - systemctl enable avahi-daemon
+  - systemctl start avahi-daemon
+  - mkdir -p /mnt/shared
+  - mount -t 9p -o trans=virtio,version=9p2000.L host0 /mnt/shared
